@@ -1,0 +1,48 @@
+{
+  "exceptions": [],
+  "consoleProblems": [],
+  "networkProblems": [],
+  "roomEnd": {
+    "key": "YinTianScene",
+    "active": true,
+    "sleeping": false,
+    "x": 1160,
+    "paused": false,
+    "inputLocked": false,
+    "cameraFollowing": true,
+    "narration": "除了激情褪去后的那一点点倦。",
+    "narrationVisible": false,
+    "completed": [
+      "yintian.room2.tie.completed",
+      "yintian.room2.silhouetteSeparation.completed",
+      "yintian.room2.memory.completed",
+      "yintian.room2.heels.completed"
+    ],
+    "eventStates": [
+      [
+        "room1-cigarette",
+        "not_started"
+      ],
+      [
+        "room1-photo",
+        "not_started"
+      ],
+      [
+        "room2-silhouette-separation",
+        "completed"
+      ],
+      [
+        "room2-tie",
+        "completed"
+      ],
+      [
+        "room2-heels",
+        "completed"
+      ],
+      [
+        "room2-memory",
+        "completed"
+      ]
+    ]
+  }
+}

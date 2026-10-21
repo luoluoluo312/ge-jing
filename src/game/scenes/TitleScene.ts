@@ -21,17 +21,8 @@ export class TitleScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    this.add
-      .text(240, 143, '请自行在外部播放《富士山下》', {
-        fontFamily: PIXEL_FONT_FAMILY,
-        fontSize: '10px',
-        color: '#a7a39c',
-        resolution: 1,
-      })
-      .setOrigin(0.5);
-
     const prompt = this.add
-      .text(240, 184, '按任意键开始', {
+      .text(240, 158, '按任意键开始', {
         fontFamily: PIXEL_FONT_FAMILY,
         fontSize: '10px',
         color: '#d9c7a4',
@@ -46,6 +37,15 @@ export class TitleScene extends Phaser.Scene {
       yoyo: true,
       repeat: -1,
     });
+
+    this.add
+      .text(466, 254, '作者：骆炫诚', {
+        fontFamily: PIXEL_FONT_FAMILY,
+        fontSize: '9px',
+        color: '#777b7c',
+        resolution: 1,
+      })
+      .setOrigin(1, 1);
 
     this.input.keyboard?.once('keydown', () => {
       this.scene.start('HubScene');

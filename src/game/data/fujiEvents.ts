@@ -1,29 +1,18 @@
-export type StoryEvent = {
-  id: string;
-  zone: { minX: number; maxX: number };
-  trigger:
-    | { type: 'interaction'; targetId: string }
-    | { type: 'zone' };
-  once: boolean;
-  lockInput: boolean;
-  cameraCue: { focusX: number; focusY: number; durationMs: number };
-  dialogue?: { title: string; body: string; footer: string };
-  visualEffect: {
-    type:
-      | 'window-reflection'
-      | 'flower-memory'
-      | 'shadow-overlap'
-      | 'phone-call'
-      | 'npc-distance'
-      | 'memorial-stone'
-      | 'coat-transfer'
-      | 'finale';
-    durationMs: number;
-  };
-  completionFlag: string;
-};
+import type { StoryEvent } from './storyEvent';
 
-export const FUJI_EVENTS: readonly StoryEvent[] = [
+export type { StoryEvent } from './storyEvent';
+
+type FujiVisualEffect =
+  | 'window-reflection'
+  | 'flower-memory'
+  | 'shadow-overlap'
+  | 'phone-call'
+  | 'npc-distance'
+  | 'memorial-stone'
+  | 'coat-transfer'
+  | 'finale';
+
+export const FUJI_EVENTS: readonly StoryEvent<FujiVisualEffect>[] = [
   {
     id: 'car-window-reflection',
     zone: { minX: 342, maxX: 424 },

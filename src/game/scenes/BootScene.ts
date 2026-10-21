@@ -5,6 +5,10 @@ export class BootScene extends Phaser.Scene {
     super('BootScene');
   }
 
+  preload(): void {
+    this.load.image('couple-source', 'assets/images/couple.png');
+  }
+
   create(): void {
     this.scene.start('TitleScene');
   }

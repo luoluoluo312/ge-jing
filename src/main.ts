@@ -4,6 +4,8 @@ import { BootScene } from './game/scenes/BootScene';
 import { FujiScene } from './game/scenes/FujiScene';
 import { HubScene } from './game/scenes/HubScene';
 import { TitleScene } from './game/scenes/TitleScene';
+import { YinTianScene } from './game/scenes/YinTianScene';
+import { YinTianTitleScene } from './game/scenes/YinTianTitleScene';
 
 const GAME_WIDTH = 480;
 const GAME_HEIGHT = 270;
@@ -22,12 +24,19 @@ const startGame = (): void => {
       mode: Phaser.Scale.NONE,
       autoCenter: Phaser.Scale.NO_CENTER,
     },
-    scene: [BootScene, TitleScene, HubScene, FujiScene],
+    scene: [
+      BootScene,
+      TitleScene,
+      HubScene,
+      FujiScene,
+      YinTianTitleScene,
+      YinTianScene,
+    ],
   });
 };
 
 document.fonts
-  .load('10px "Fusion Pixel"', '富士山入口暂停继续')
+  .load('10px "Fusion Pixel"', '富士山入口暂停继续阴天房间香烟照片')
   .then(startGame)
   .catch((error: unknown) => {
     console.warn('Pixel font failed to load; using fallback.', error);

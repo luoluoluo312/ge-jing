@@ -31,7 +31,7 @@ export class NarrationSystem {
       .setVisible(false);
   }
 
-  playOnce(id: string, message: string): void {
+  playOnce(id: string, message: string, y = 45, scale = 1): void {
     const seen = this.scene.registry.get('seenNarrations') as string[] | undefined;
     const seenIds = new Set(seen ?? []);
     if (seenIds.has(id)) {
@@ -40,13 +40,18 @@ export class NarrationSystem {
 
     seenIds.add(id);
     this.scene.registry.set('seenNarrations', [...seenIds]);
-    this.show(message);
+    this.show(message, 3000, y, scale);
   }
 
-  show(message: string, durationMs = 3000): void {
+  show(message: string, durationMs = 3000, y = 45, scale = 1): void {
     this.hideTimer?.remove(false);
     this.scene.tweens.killTweensOf(this.text);
-    this.text.setText(message).setVisible(true).setAlpha(0);
+    this.text
+      .setPosition(240, y)
+      .setScale(scale)
+      .setText(message)
+      .setVisible(true)
+      .setAlpha(0);
     this.scene.tweens.add({
       targets: this.text,
       alpha: 0.9,

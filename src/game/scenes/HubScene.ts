@@ -19,6 +19,7 @@ const PLAYER_START_X = 240;
 const PLAYER_SPEED = 76;
 const PLAYER_MARGIN = 16;
 const ENTRY_X = 540;
+const YIN_TIAN_DOOR_X = 930;
 
 type ControlKeys = {
   leftA: Phaser.Input.Keyboard.Key;
@@ -34,6 +35,8 @@ export class HubScene extends Phaser.Scene {
   private interactions!: InteractionSystem;
   private dialogue!: DialogueBox;
   private pauseOverlay!: Phaser.GameObjects.Container;
+  private fujiSign!: Phaser.GameObjects.Container;
+  private yinTianSign!: Phaser.GameObjects.Container;
   private entrancePromptOpen = false;
   private paused = false;
   private keys!: ControlKeys;
@@ -77,6 +80,17 @@ export class HubScene extends Phaser.Scene {
       label: '富士山入口',
       onInteract: () => this.openEntrancePrompt(),
     });
+    this.interactions.addTarget({
+      id: 'yintian-door',
+      x: YIN_TIAN_DOOR_X,
+      y: GROUND_Y,
+      range: 42,
+      label: '推门',
+      name: '半掩的门',
+      nameRange: 90,
+      nameOffsetY: 104,
+      onInteract: () => this.enterYinTianWorld(),
+    });
 
     const camera = this.cameras.main;
     camera.setBounds(0, 0, WORLD_WIDTH, GAME_HEIGHT);
@@ -89,7 +103,7 @@ export class HubScene extends Phaser.Scene {
     this.events.on(Phaser.Scenes.Events.WAKE, this.handleWake, this);
   }
 
-  update(_time: number, delta: number): void {
+  update(time: number, delta: number): void {
     if (this.entrancePromptOpen) {
       this.traveler.stop();
 
@@ -120,6 +134,7 @@ export class HubScene extends Phaser.Scene {
       WORLD_WIDTH - PLAYER_MARGIN,
     );
     this.traveler.updateMotion(direction, delta);
+    this.updateWorldSigns(time);
     this.interactions.update();
   }
 
@@ -148,17 +163,101 @@ export class HubScene extends Phaser.Scene {
     foreground.fillRect(ENTRY_X - 40, GROUND_Y - 68, 80, 5);
     foreground.fillRect(ENTRY_X - 32, GROUND_Y - 55, 64, 4);
 
-    this.add
-      .text(ENTRY_X, GROUND_Y - 84, '富士山入口', {
+    foreground.fillStyle(0x0b0e12);
+    foreground.fillRect(YIN_TIAN_DOOR_X - 36, GROUND_Y - 93, 72, 93);
+    foreground.fillStyle(0x1f2429);
+    foreground.fillRect(YIN_TIAN_DOOR_X - 31, GROUND_Y - 88, 62, 88);
+    foreground.fillStyle(0x11161b);
+    foreground.fillRect(YIN_TIAN_DOOR_X - 27, GROUND_Y - 84, 54, 84);
+    foreground.fillStyle(0x2c3137);
+    foreground.fillRect(YIN_TIAN_DOOR_X - 24, GROUND_Y - 82, 46, 82);
+    foreground.fillStyle(0x454b50);
+    foreground.fillRect(YIN_TIAN_DOOR_X - 20, GROUND_Y - 78, 34, 26);
+    foreground.fillRect(YIN_TIAN_DOOR_X - 20, GROUND_Y - 45, 34, 35);
+    foreground.fillStyle(0xdbe4e6, 0.8);
+    foreground.fillRect(YIN_TIAN_DOOR_X + 22, GROUND_Y - 82, 5, 82);
+    foreground.fillStyle(0xdbe4e6, 0.66);
+    foreground.fillRect(YIN_TIAN_DOOR_X + 21, GROUND_Y - 79, 2, 76);
+    foreground.fillStyle(0xb9a16f);
+    foreground.fillRect(YIN_TIAN_DOOR_X + 16, GROUND_Y - 42, 3, 3);
+
+    foreground.fillStyle(0xd6a355, 0.08);
+    foreground.beginPath();
+    foreground.moveTo(ENTRY_X - 24, GROUND_Y - 1);
+    foreground.lineTo(ENTRY_X + 24, GROUND_Y - 1);
+    foreground.lineTo(ENTRY_X + 88, GROUND_Y + 22);
+    foreground.lineTo(ENTRY_X - 88, GROUND_Y + 22);
+    foreground.closePath();
+    foreground.fillPath();
+    foreground.fillStyle(0xd6a355, 0.12);
+    foreground.fillRect(ENTRY_X - 54, GROUND_Y + 4, 108, 5);
+
+    foreground.fillStyle(0xdce7e8, 0.08);
+    foreground.beginPath();
+    foreground.moveTo(YIN_TIAN_DOOR_X - 30, GROUND_Y - 1);
+    foreground.lineTo(YIN_TIAN_DOOR_X + 30, GROUND_Y - 1);
+    foreground.lineTo(YIN_TIAN_DOOR_X + 102, GROUND_Y + 24);
+    foreground.lineTo(YIN_TIAN_DOOR_X - 102, GROUND_Y + 24);
+    foreground.closePath();
+    foreground.fillPath();
+    foreground.fillStyle(0xdce7e8, 0.14);
+    foreground.fillRect(YIN_TIAN_DOOR_X - 68, GROUND_Y + 5, 136, 4);
+
+    this.fujiSign = this.createWorldSign(
+      ENTRY_X,
+      GROUND_Y - 96,
+      '富士山下',
+      0xd8b47e,
+    );
+    this.yinTianSign = this.createWorldSign(
+      YIN_TIAN_DOOR_X,
+      GROUND_Y - 104,
+      '阴天',
+      0xcbd8dc,
+    );
+  }
+
+  private createWorldSign(
+    x: number,
+    y: number,
+    label: string,
+    accent: number,
+  ): Phaser.GameObjects.Container {
+    const board = this.add.graphics();
+    board.fillStyle(0x100b09);
+    board.fillRect(-33, -12, 66, 24);
+    board.fillStyle(0x4a3020);
+    board.fillRect(-30, -10, 60, 20);
+    board.fillStyle(0x68452e);
+    board.fillRect(-27, -8, 54, 3);
+    board.fillRect(-27, 7, 54, 2);
+    board.fillStyle(0x2c1b14, 0.7);
+    board.fillRect(-24, -3, 48, 1);
+    board.fillStyle(accent, 0.26);
+    board.fillRect(-27, -7, 2, 15);
+
+    const text = this.add
+      .text(0, 0, label, {
         fontFamily: PIXEL_FONT_FAMILY,
         fontSize: '10px',
-        color: '#d8e1ef',
-        backgroundColor: '#071225b8',
-        padding: { x: 3, y: 2 },
+        color: '#e5dfd3',
         resolution: 1,
       })
-      .setOrigin(0.5)
-      .setDepth(2);
+      .setOrigin(0.5);
+    return this.add
+      .container(x, y, [board, text])
+      .setDepth(3)
+      .setAlpha(0.82);
+  }
+
+  private updateWorldSigns(time: number): void {
+    const pulse = 0.82 + (Math.sin(time / 190) * 0.5 + 0.5) * 0.14;
+    this.fujiSign.setAlpha(
+      Math.abs(this.traveler.x - ENTRY_X) <= 80 ? pulse : 0.82,
+    );
+    this.yinTianSign.setAlpha(
+      Math.abs(this.traveler.x - YIN_TIAN_DOOR_X) <= 80 ? pulse : 0.82,
+    );
   }
 
   private createFixedUi(): void {
@@ -232,6 +331,25 @@ export class HubScene extends Phaser.Scene {
     this.registry.set('completedStoryEvents', []);
     this.registry.set('seenNarrations', []);
     this.scene.launch('FujiScene');
+    this.scene.sleep();
+  }
+
+  private enterYinTianWorld(): void {
+    this.interactions.setEnabled(false);
+    this.traveler.stop();
+    this.input.keyboard?.resetKeys();
+    for (const sceneKey of ['YinTianTitleScene', 'YinTianScene']) {
+      if (
+        this.scene.isSleeping(sceneKey) ||
+        this.scene.isActive(sceneKey)
+      ) {
+        this.scene.stop(sceneKey);
+      }
+    }
+
+    this.registry.set('completedStoryEvents', []);
+    this.registry.set('seenNarrations', []);
+    this.scene.launch('YinTianTitleScene');
     this.scene.sleep();
   }
 

@@ -1,0 +1,43 @@
+{
+  "exceptions": [],
+  "consoleProblems": [],
+  "networkProblems": [],
+  "roomEndX": 400,
+  "resetRoom": {
+    "key": "YinTianScene",
+    "active": true,
+    "sleeping": false,
+    "x": 64,
+    "paused": false,
+    "inputLocked": false,
+    "cigaretteElapsed": 0,
+    "cigaretteActive": false,
+    "narration": "",
+    "narrationVisible": false,
+    "completed": [],
+    "eventStates": [
+      [
+        "room1-cigarette",
+        "not_started"
+      ],
+      [
+        "room1-photo",
+        "not_started"
+      ]
+    ],
+    "targets": [
+      {
+        "id": "room1-exit",
+        "enabled": true
+      },
+      {
+        "id": "room1-cigarette",
+        "enabled": true
+      },
+      {
+        "id": "room1-photo",
+        "enabled": true
+      }
+    ]
+  }
+}

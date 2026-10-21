@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-import type { StoryEvent } from '../data/fujiEvents';
+import type { StoryEvent } from '../data/storyEvent';
 
 export type StoryState = 'not_started' | 'running' | 'completed';
 

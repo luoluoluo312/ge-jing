@@ -1,0 +1,188 @@
+{
+  "exceptions": [],
+  "consoleProblems": [],
+  "networkProblems": [],
+  "signPulse": [
+    0.8793822602295152,
+    0.9499603905155218
+  ],
+  "room2Text": {
+    "key": "YinTianScene",
+    "active": true,
+    "x": 878.181760000006,
+    "inputLocked": false,
+    "cameraFollowing": true,
+    "cameraZoom": 1,
+    "narration": "那几年，感性赢了理性。",
+    "narrationVisible": true,
+    "narrationX": 240,
+    "narrationY": 44,
+    "nameLabel": "撕碎的照片",
+    "nameLabelX": 880,
+    "nameLabelY": 233,
+    "promptText": "E  查看",
+    "promptY": 258,
+    "reflectionVisible": false,
+    "reflectionAlpha": 0,
+    "fujiSignAlpha": null,
+    "yinTianSignAlpha": null,
+    "completed": [
+      "yintian.room2.memory.completed",
+      "yintian.room2.tornPhoto.completed"
+    ],
+    "eventStates": [
+      [
+        "room1-cigarette",
+        "not_started"
+      ],
+      [
+        "room1-photo",
+        "not_started"
+      ],
+      [
+        "room2-tie",
+        "not_started"
+      ],
+      [
+        "room2-heels",
+        "not_started"
+      ],
+      [
+        "room2-wine",
+        "not_started"
+      ],
+      [
+        "room2-torn-photo",
+        "completed"
+      ],
+      [
+        "room2-memory",
+        "completed"
+      ],
+      [
+        "room3-wedding-window",
+        "not_started"
+      ]
+    ]
+  },
+  "reflectionState": {
+    "key": "YinTianScene",
+    "active": true,
+    "x": 1598.454640000014,
+    "inputLocked": false,
+    "cameraFollowing": true,
+    "cameraZoom": 1,
+    "narration": "总之那几年，你们两个没有缘。",
+    "narrationVisible": false,
+    "narrationX": 240,
+    "narrationY": 135,
+    "nameLabel": "熄灭的烟头",
+    "nameLabelX": 1650,
+    "nameLabelY": 196,
+    "promptText": "E  返回主世界",
+    "promptY": 258,
+    "reflectionVisible": true,
+    "reflectionAlpha": 0.34,
+    "fujiSignAlpha": null,
+    "yinTianSignAlpha": null,
+    "completed": [
+      "yintian.room2.memory.completed",
+      "yintian.room2.tornPhoto.completed",
+      "yintian.room3.weddingWindow.completed"
+    ],
+    "eventStates": [
+      [
+        "room1-cigarette",
+        "not_started"
+      ],
+      [
+        "room1-photo",
+        "not_started"
+      ],
+      [
+        "room2-tie",
+        "not_started"
+      ],
+      [
+        "room2-heels",
+        "not_started"
+      ],
+      [
+        "room2-wine",
+        "not_started"
+      ],
+      [
+        "room2-torn-photo",
+        "completed"
+      ],
+      [
+        "room2-memory",
+        "completed"
+      ],
+      [
+        "room3-wedding-window",
+        "completed"
+      ]
+    ]
+  },
+  "finalState": {
+    "key": "YinTianScene",
+    "active": true,
+    "x": 1621.1440000000152,
+    "inputLocked": false,
+    "cameraFollowing": true,
+    "cameraZoom": 1,
+    "narration": "总之那几年，你们两个没有缘。",
+    "narrationVisible": false,
+    "narrationX": 240,
+    "narrationY": 135,
+    "nameLabel": "熄灭的烟头",
+    "nameLabelX": 1650,
+    "nameLabelY": 196,
+    "promptText": "E  查看",
+    "promptY": 258,
+    "reflectionVisible": true,
+    "reflectionAlpha": 0.34,
+    "fujiSignAlpha": null,
+    "yinTianSignAlpha": null,
+    "completed": [
+      "yintian.room2.memory.completed",
+      "yintian.room2.tornPhoto.completed",
+      "yintian.room3.weddingWindow.completed"
+    ],
+    "eventStates": [
+      [
+        "room1-cigarette",
+        "not_started"
+      ],
+      [
+        "room1-photo",
+        "not_started"
+      ],
+      [
+        "room2-tie",
+        "not_started"
+      ],
+      [
+        "room2-heels",
+        "not_started"
+      ],
+      [
+        "room2-wine",
+        "not_started"
+      ],
+      [
+        "room2-torn-photo",
+        "completed"
+      ],
+      [
+        "room2-memory",
+        "completed"
+      ],
+      [
+        "room3-wedding-window",
+        "completed"
+      ]
+    ]
+  }
+}
