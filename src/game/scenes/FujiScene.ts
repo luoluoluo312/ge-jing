@@ -628,7 +628,7 @@ export class FujiScene extends Phaser.Scene {
         );
       }
 
-      this.memoryMale.x += 52 * (delta / 1000);
+      this.memoryMale.x += 88 * (delta / 1000);
       this.memoryFemale.x = this.memoryMale.x + ACT3_PAIR_GAP;
       const fade = 1 - Phaser.Math.Clamp(
         (this.memoryMale.x - ACT4_START_X) / (ACT4_END_X - ACT4_START_X),
