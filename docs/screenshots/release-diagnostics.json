@@ -1,0 +1,85 @@
+{
+  "finalUrl": "http://127.0.0.1:5190/",
+  "exceptions": [],
+  "consoleProblems": [],
+  "finalScene": {
+    "key": "FujiScene",
+    "active": true,
+    "sleeping": false,
+    "x": 5978,
+    "inputLocked": false,
+    "phoneCallActive": false,
+    "phoneAccepted": true,
+    "phoneIncomingVisible": false,
+    "answerVisible": false,
+    "messageBannerVisible": true,
+    "messageText": "路过花店，\n想起你曾喜欢\n那里的白桔梗。",
+    "messageTextAlpha": 1,
+    "narrationText": "我也该继续走了。",
+    "narrationVisible": true,
+    "dialogueVisible": false,
+    "coatItemVisible": false,
+    "coatItemX": null,
+    "coatItemAlpha": null,
+    "femaleWalkingToBench": false,
+    "benchReady": true,
+    "finaleSitting": true,
+    "coatTransferred": true,
+    "memoryMale": {
+      "x": 5130,
+      "pose": "idle",
+      "coatWorn": false
+    },
+    "memoryFemale": {
+      "x": 6210,
+      "pose": "idle",
+      "coatWorn": true,
+      "sitting": false,
+      "visible": false,
+      "alpha": 0
+    },
+    "completed": [
+      "act1.flowerPhoneCall.completed",
+      "act2.flowerWindowMemory.completed",
+      "act3.shadowOverlap.completed",
+      "act4.npcDistance.completed",
+      "act4.memorialStoneDiscovered",
+      "act5.coatTransfer.completed",
+      "act5.benchFinale.completed"
+    ],
+    "eventStates": [
+      [
+        "car-window-reflection",
+        "not_started"
+      ],
+      [
+        "flower-window-memory",
+        "completed"
+      ],
+      [
+        "shadow-overlap",
+        "completed"
+      ],
+      [
+        "npc-distance",
+        "completed"
+      ],
+      [
+        "flower-phone-call",
+        "completed"
+      ],
+      [
+        "memorial-stone-discovery",
+        "completed"
+      ],
+      [
+        "coat-transfer",
+        "completed"
+      ],
+      [
+        "bench-finale",
+        "completed"
+      ]
+    ]
+  }
+}
