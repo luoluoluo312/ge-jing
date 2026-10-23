@@ -169,7 +169,7 @@ function drawWindow(scene: Phaser.Scene): WindowVisuals {
   rightCurtain.fillRect(14, 7, 2, 143);
   rightCurtain.fillRect(50, 7, 2, 143);
 
-  const curtainMaskSource = scene.make.graphics({ x: 0, y: 0, add: false });
+  const curtainMaskSource = scene.make.graphics({ x: 0, y: 0 }, false);
   curtainMaskSource.fillStyle(0xffffff);
   curtainMaskSource.fillRect(20, 48, 132, 158);
   rightCurtain.setMask(curtainMaskSource.createGeometryMask());
