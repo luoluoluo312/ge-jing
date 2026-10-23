@@ -42,6 +42,7 @@ import { WeatherSystem } from '../systems/WeatherSystem';
 import { NarrationSystem } from '../systems/NarrationSystem';
 import { DialogueBox } from '../ui/DialogueBox';
 import { PhoneUI } from '../ui/PhoneUI';
+import { WorldMusicPlayer } from '../ui/WorldMusicPlayer';
 import { PIXEL_FONT_FAMILY } from '../ui/pixelFont';
 
 const GAME_WIDTH = 480;
@@ -186,6 +187,11 @@ export class FujiScene extends Phaser.Scene {
     this.dialogue = new DialogueBox(this);
     this.phoneUI = new PhoneUI(this, () => this.acceptPhoneCall());
     this.narration = new NarrationSystem(this);
+    new WorldMusicPlayer(
+      this,
+      '《富士山下》',
+      'assets/audio/fuji.mp3',
+    );
     this.storyDirector = new StoryDirector(this, FUJI_EVENTS);
     this.time.delayedCall(350, () => {
       this.narration.show(

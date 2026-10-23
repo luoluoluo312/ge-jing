@@ -86,9 +86,6 @@ export class HubScene extends Phaser.Scene {
       y: GROUND_Y,
       range: 42,
       label: '推门',
-      name: '半掩的门',
-      nameRange: 90,
-      nameOffsetY: 104,
       onInteract: () => this.enterYinTianWorld(),
     });
 
@@ -170,16 +167,18 @@ export class HubScene extends Phaser.Scene {
     foreground.fillStyle(0x11161b);
     foreground.fillRect(YIN_TIAN_DOOR_X - 27, GROUND_Y - 84, 54, 84);
     foreground.fillStyle(0x2c3137);
-    foreground.fillRect(YIN_TIAN_DOOR_X - 24, GROUND_Y - 82, 46, 82);
+    foreground.fillRect(YIN_TIAN_DOOR_X - 24, GROUND_Y - 82, 34, 82);
     foreground.fillStyle(0x454b50);
-    foreground.fillRect(YIN_TIAN_DOOR_X - 20, GROUND_Y - 78, 34, 26);
-    foreground.fillRect(YIN_TIAN_DOOR_X - 20, GROUND_Y - 45, 34, 35);
-    foreground.fillStyle(0xdbe4e6, 0.8);
-    foreground.fillRect(YIN_TIAN_DOOR_X + 22, GROUND_Y - 82, 5, 82);
-    foreground.fillStyle(0xdbe4e6, 0.66);
-    foreground.fillRect(YIN_TIAN_DOOR_X + 21, GROUND_Y - 79, 2, 76);
+    foreground.fillRect(YIN_TIAN_DOOR_X - 20, GROUND_Y - 78, 24, 26);
+    foreground.fillRect(YIN_TIAN_DOOR_X - 20, GROUND_Y - 45, 24, 35);
+    foreground.fillStyle(0xffb95f, 0.26);
+    foreground.fillRect(YIN_TIAN_DOOR_X + 8, GROUND_Y - 82, 19, 82);
+    foreground.fillStyle(0xffd083, 0.72);
+    foreground.fillRect(YIN_TIAN_DOOR_X + 12, GROUND_Y - 80, 10, 78);
+    foreground.fillStyle(0xffedbd, 0.72);
+    foreground.fillRect(YIN_TIAN_DOOR_X + 15, GROUND_Y - 76, 3, 72);
     foreground.fillStyle(0xb9a16f);
-    foreground.fillRect(YIN_TIAN_DOOR_X + 16, GROUND_Y - 42, 3, 3);
+    foreground.fillRect(YIN_TIAN_DOOR_X + 4, GROUND_Y - 42, 3, 3);
 
     foreground.fillStyle(0xd6a355, 0.08);
     foreground.beginPath();
@@ -192,7 +191,7 @@ export class HubScene extends Phaser.Scene {
     foreground.fillStyle(0xd6a355, 0.12);
     foreground.fillRect(ENTRY_X - 54, GROUND_Y + 4, 108, 5);
 
-    foreground.fillStyle(0xdce7e8, 0.08);
+    foreground.fillStyle(0xffc46d, 0.11);
     foreground.beginPath();
     foreground.moveTo(YIN_TIAN_DOOR_X - 30, GROUND_Y - 1);
     foreground.lineTo(YIN_TIAN_DOOR_X + 30, GROUND_Y - 1);
@@ -200,7 +199,7 @@ export class HubScene extends Phaser.Scene {
     foreground.lineTo(YIN_TIAN_DOOR_X - 102, GROUND_Y + 24);
     foreground.closePath();
     foreground.fillPath();
-    foreground.fillStyle(0xdce7e8, 0.14);
+    foreground.fillStyle(0xffce7d, 0.2);
     foreground.fillRect(YIN_TIAN_DOOR_X - 68, GROUND_Y + 5, 136, 4);
 
     this.fujiSign = this.createWorldSign(
@@ -304,7 +303,7 @@ export class HubScene extends Phaser.Scene {
     this.input.keyboard?.resetKeys();
     this.dialogue.show(
       '富士山下',
-      '进入前，请先在外部循环播放《富士山下》。\n游戏不会播放、同步或显示歌词。',
+      '',
       'E 进入    Esc 返回',
     );
   }

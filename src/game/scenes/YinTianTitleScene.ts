@@ -30,15 +30,6 @@ export class YinTianTitleScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    this.add
-      .text(240, 160, '请自行在外部播放', {
-        fontFamily: PIXEL_FONT_FAMILY,
-        fontSize: '8px',
-        color: '#7f878c',
-        resolution: 1,
-      })
-      .setOrigin(0.5);
-
     const prompt = this.add
       .text(240, 192, '按任意键进入房间', {
         fontFamily: PIXEL_FONT_FAMILY,

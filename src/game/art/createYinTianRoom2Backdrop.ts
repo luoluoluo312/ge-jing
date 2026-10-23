@@ -9,7 +9,7 @@ export const YIN_TIAN_MEMORY_X = 900;
 export const YIN_TIAN_TIE_X = 700;
 export const YIN_TIAN_HEELS_X = 1035;
 export const YIN_TIAN_WINE_X = 1100;
-export const YIN_TIAN_TORN_PHOTO_X = 880;
+export const YIN_TIAN_TORN_PHOTO_X = 820;
 
 export type YinTianRoom2Environment = {
   update(delta: number): void;
@@ -21,6 +21,16 @@ export function createYinTianRoom2Backdrop(
   scene: Phaser.Scene,
 ): YinTianRoom2Environment {
   const wall = drawRoom2Wall(scene);
+  const coolBase = scene.add
+    .rectangle(
+      (YIN_TIAN_ROOM2_START_X + YIN_TIAN_ROOM2_END_X) / 2,
+      135,
+      YIN_TIAN_ROOM2_END_X - YIN_TIAN_ROOM2_START_X,
+      270,
+      0x24213f,
+    )
+    .setDepth(-29);
+  coolBase.setVisible(true);
   drawRoom2Floor(scene);
   drawPendantLamp(scene);
   drawThresholdDoor(scene);
@@ -38,17 +48,6 @@ export function createYinTianRoom2Backdrop(
     )
     .setDepth(1)
     .setAlpha(0);
-  const dimmer = scene.add
-    .rectangle(
-      (YIN_TIAN_ROOM2_START_X + YIN_TIAN_ROOM2_END_X) / 2,
-      135,
-      YIN_TIAN_ROOM2_END_X - YIN_TIAN_ROOM2_START_X,
-      270,
-      0x202850,
-      1,
-    )
-    .setDepth(3)
-    .setAlpha(0);
   const vignette = createVignette(scene);
   let elapsed = 0;
   let broken = false;
@@ -56,7 +55,9 @@ export function createYinTianRoom2Backdrop(
   return {
     update(delta: number): void {
       elapsed += delta;
-      wall.setAlpha(0.96 + Math.sin(elapsed / 920) * 0.02);
+      wall.setAlpha(
+        broken ? 0.2 : 0.96 + Math.sin(elapsed / 920) * 0.02,
+      );
     },
     setVignetteActive(active: boolean): void {
       vignette.setVisible(active);
@@ -77,8 +78,8 @@ export function createYinTianRoom2Backdrop(
       });
       scene.time.delayedCall(260, () => {
         scene.tweens.add({
-          targets: dimmer,
-          alpha: 0.82,
+          targets: wall,
+          alpha: 0.2,
           duration: 160,
         });
       });
@@ -89,20 +90,6 @@ export function createYinTianRoom2Backdrop(
           duration: 90,
           yoyo: true,
           repeat: 1,
-        });
-      });
-      scene.time.delayedCall(760, () => {
-        scene.tweens.add({
-          targets: dimmer,
-          alpha: 0.8,
-          duration: 80,
-        });
-      });
-      scene.time.delayedCall(1000, () => {
-        scene.tweens.add({
-          targets: dimmer,
-          alpha: 0.86,
-          duration: 220,
         });
       });
     },
@@ -316,19 +303,19 @@ function drawFloorObjects(scene: Phaser.Scene): void {
   objects.fillRect(1083, 248, 8, 1);
 
   objects.fillStyle(0x2a2220);
-  objects.fillRect(857, 248, 18, 15);
-  objects.fillRect(880, 250, 17, 14);
+  objects.fillRect(YIN_TIAN_TORN_PHOTO_X - 23, 248, 18, 15);
+  objects.fillRect(YIN_TIAN_TORN_PHOTO_X, 250, 17, 14);
   objects.fillStyle(0xc5b8a3);
-  objects.fillRect(860, 250, 12, 11);
-  objects.fillRect(883, 252, 11, 10);
+  objects.fillRect(YIN_TIAN_TORN_PHOTO_X - 20, 250, 12, 11);
+  objects.fillRect(YIN_TIAN_TORN_PHOTO_X + 3, 252, 11, 10);
   objects.fillStyle(0x8e7462);
-  objects.fillRect(861, 252, 3, 2);
-  objects.fillRect(868, 253, 2, 2);
-  objects.fillRect(885, 254, 3, 2);
-  objects.fillRect(890, 255, 2, 2);
+  objects.fillRect(YIN_TIAN_TORN_PHOTO_X - 19, 252, 3, 2);
+  objects.fillRect(YIN_TIAN_TORN_PHOTO_X - 12, 253, 2, 2);
+  objects.fillRect(YIN_TIAN_TORN_PHOTO_X + 5, 254, 3, 2);
+  objects.fillRect(YIN_TIAN_TORN_PHOTO_X + 10, 255, 2, 2);
   objects.fillStyle(0x5a3d33);
-  objects.fillRect(868, 254, 2, 1);
-  objects.fillRect(892, 256, 2, 1);
+  objects.fillRect(YIN_TIAN_TORN_PHOTO_X - 12, 254, 2, 1);
+  objects.fillRect(YIN_TIAN_TORN_PHOTO_X + 12, 256, 2, 1);
 }
 
 function createVignette(scene: Phaser.Scene): Phaser.GameObjects.Graphics {

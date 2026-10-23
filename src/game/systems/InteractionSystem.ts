@@ -136,6 +136,7 @@ export class InteractionSystem {
       nearbyTargets
         .filter(
           ({ target, distance }) =>
+            target.enabled !== false &&
             Boolean(target.name) &&
             distance <= (target.nameRange ?? target.range),
         )

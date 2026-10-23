@@ -1,6 +1,7 @@
 import type { StoryEvent } from './storyEvent';
 
 type YinTianVisualEffect =
+  | 'curtain-open'
   | 'cigarette-smoke'
   | 'photo-memory'
   | 'room2-memory'
@@ -9,22 +10,32 @@ type YinTianVisualEffect =
 
 export const YIN_TIAN_EVENTS: readonly StoryEvent<YinTianVisualEffect>[] = [
   {
+    id: 'room1-curtain',
+    zone: { minX: 40, maxX: 125 },
+    trigger: { type: 'interaction', targetId: 'room1-curtain' },
+    once: true,
+    lockInput: true,
+    cameraCue: { focusX: 82, focusY: 135, durationMs: 0 },
+    visualEffect: { type: 'curtain-open', durationMs: 15000 },
+    completionFlag: 'yintian.room1.curtain.completed',
+  },
+  {
     id: 'room1-cigarette',
-    zone: { minX: 94, maxX: 130 },
+    zone: { minX: 206, maxX: 238 },
     trigger: { type: 'interaction', targetId: 'room1-cigarette' },
     once: true,
     lockInput: true,
-    cameraCue: { focusX: 240, focusY: 135, durationMs: 0 },
+    cameraCue: { focusX: 222, focusY: 135, durationMs: 0 },
     visualEffect: { type: 'cigarette-smoke', durationMs: 3000 },
     completionFlag: 'yintian.room1.cigarette.completed',
   },
   {
     id: 'room1-photo',
-    zone: { minX: 153, maxX: 197 },
+    zone: { minX: 268, maxX: 300 },
     trigger: { type: 'interaction', targetId: 'room1-photo' },
     once: true,
     lockInput: true,
-    cameraCue: { focusX: 174, focusY: 195, durationMs: 650 },
+    cameraCue: { focusX: 284, focusY: 195, durationMs: 650 },
     visualEffect: { type: 'photo-memory', durationMs: 4000 },
     completionFlag: 'yintian.room1.photo.completed',
   },
@@ -63,13 +74,12 @@ export const YIN_TIAN_EVENTS: readonly StoryEvent<YinTianVisualEffect>[] = [
   },
   {
     id: 'room2-torn-photo',
-    zone: { minX: 852, maxX: 908 },
+    zone: { minX: 792, maxX: 848 },
     trigger: { type: 'interaction', targetId: 'room2-torn-photo' },
     once: true,
-    lockInput: false,
-    cameraCue: { focusX: 880, focusY: 245, durationMs: 0 },
-    caption: '那几年，感性赢了理性。',
-    visualEffect: { type: 'object-inspection', durationMs: 3000 },
+    lockInput: true,
+    cameraCue: { focusX: 820, focusY: 245, durationMs: 0 },
+    visualEffect: { type: 'object-inspection', durationMs: 18000 },
     completionFlag: 'yintian.room2.tornPhoto.completed',
   },
   {

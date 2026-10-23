@@ -3,6 +3,7 @@ import Phaser from 'phaser';
 import {
   createYinTianBackdrop,
   YIN_TIAN_CIGARETTE_X,
+  YIN_TIAN_CURTAIN_X,
   YIN_TIAN_GROUND_Y,
   YIN_TIAN_PHOTO_X,
   YIN_TIAN_PHOTO_Y,
@@ -14,7 +15,11 @@ import {
   YIN_TIAN_WORLD_WIDTH,
   type YinTianEnvironment,
 } from '../art/createYinTianBackdrop';
-import { createYinTianPhotoTexture } from '../art/createYinTianPhoto';
+import {
+  createYinTianPhotoTexture,
+  createYinTianPuzzleTextures,
+  createYinTianTornPhotoTextures,
+} from '../art/createYinTianPhoto';
 import {
   createYinTianRoom2Backdrop,
   YIN_TIAN_HEELS_X,
@@ -38,14 +43,16 @@ import { YinTianMemoryFigures } from '../entities/YinTianMemoryFigures';
 import { InteractionSystem } from '../systems/InteractionSystem';
 import { NarrationSystem } from '../systems/NarrationSystem';
 import { StoryDirector } from '../systems/StoryDirector';
+import { WorldMusicPlayer } from '../ui/WorldMusicPlayer';
 import { PIXEL_FONT_FAMILY } from '../ui/pixelFont';
 
 const GAME_WIDTH = 480;
 const GAME_HEIGHT = 270;
 const PLAYER_SPEED = 72;
 const PLAYER_LEFT_LIMIT = 28;
-const CIGARETTE_TIP_X = 112;
-const CIGARETTE_TIP_Y = 199;
+const CIGARETTE_TIP_X = 224;
+const CIGARETTE_TIP_Y = 198;
+const CURTAIN_DRAG_DISTANCE = 110;
 
 type ControlKeys = {
   leftA: Phaser.Input.Keyboard.Key;
@@ -53,6 +60,13 @@ type ControlKeys = {
   leftArrow: Phaser.Input.Keyboard.Key;
   rightArrow: Phaser.Input.Keyboard.Key;
   pause: Phaser.Input.Keyboard.Key;
+};
+
+type TornPhotoPiece = {
+  image: Phaser.GameObjects.Image;
+  targetX: number;
+  targetY: number;
+  solved: boolean;
 };
 
 export class YinTianScene extends Phaser.Scene {
@@ -69,6 +83,18 @@ export class YinTianScene extends Phaser.Scene {
   private cigaretteFx!: Phaser.GameObjects.Graphics;
   private photoSmall!: Phaser.GameObjects.Container;
   private photoOverlay!: Phaser.GameObjects.Container;
+  private tornPhotoOverlay?: Phaser.GameObjects.Container;
+  private tornPhotoLeftTexture = '';
+  private tornPhotoRightTexture = '';
+  private photoPuzzleTextures: readonly string[] = [];
+  private photoPuzzlePieces: TornPhotoPiece[] = [];
+  private photoPuzzleDraggingPiece?: TornPhotoPiece;
+  private photoPuzzleDragOffsetX = 0;
+  private photoPuzzleDragOffsetY = 0;
+  private activeTornPhotoEvent?: StoryEvent;
+  private photoPuzzleTimeout?: Phaser.Time.TimerEvent;
+  private photoPuzzleRevealStarted = false;
+  private photoPuzzleFinished = false;
   private photoDim!: Phaser.GameObjects.Rectangle;
   private windowReflection!: Traveler;
   private objectHighlight!: Phaser.GameObjects.Graphics;
@@ -86,6 +112,15 @@ export class YinTianScene extends Phaser.Scene {
   private endingAwaitingExit = false;
   private room3ExitHandled = false;
   private room3Event?: StoryEvent;
+  private curtainEvent?: StoryEvent;
+  private curtainFallback?: Phaser.Time.TimerEvent;
+  private curtainDragging = false;
+  private curtainDragStartX = 0;
+  private curtainProgress = 0;
+  private curtainComplete = false;
+  private room1Darkness!: Phaser.GameObjects.Rectangle;
+  private curtainHint!: Phaser.GameObjects.Text;
+  private room1Flash!: Phaser.GameObjects.Rectangle;
   private cigaretteElapsed = 0;
   private cigaretteActive = false;
 
@@ -108,6 +143,21 @@ export class YinTianScene extends Phaser.Scene {
     this.endingAwaitingExit = false;
     this.room3ExitHandled = false;
     this.room3Event = undefined;
+    this.curtainEvent = undefined;
+    this.curtainFallback = undefined;
+    this.curtainDragging = false;
+    this.curtainDragStartX = 0;
+    this.curtainProgress = 0;
+    this.curtainComplete = false;
+    this.tornPhotoOverlay = undefined;
+    this.photoPuzzlePieces = [];
+    this.photoPuzzleDraggingPiece = undefined;
+    this.photoPuzzleDragOffsetX = 0;
+    this.photoPuzzleDragOffsetY = 0;
+    this.activeTornPhotoEvent = undefined;
+    this.photoPuzzleTimeout = undefined;
+    this.photoPuzzleRevealStarted = false;
+    this.photoPuzzleFinished = false;
     this.cigaretteElapsed = 0;
     this.cigaretteActive = false;
 
@@ -207,21 +257,68 @@ export class YinTianScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(74)
       .setVisible(false);
+    this.room1Darkness = this.add
+      .rectangle(
+        GAME_WIDTH / 2,
+        GAME_HEIGHT / 2,
+        GAME_WIDTH,
+        GAME_HEIGHT,
+        0x03070c,
+        0.84,
+      )
+      .setScrollFactor(0)
+      .setDepth(7);
+    this.curtainHint = this.add
+      .text(240, 242, '按住鼠标左键向右拖拽', {
+        fontFamily: PIXEL_FONT_FAMILY,
+        fontSize: '9px',
+        color: '#dce4e5',
+        backgroundColor: '#070b10d9',
+        padding: { x: 5, y: 2 },
+        resolution: 1,
+      })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(76)
+      .setVisible(false);
+    this.room1Flash = this.add
+      .rectangle(
+        GAME_WIDTH / 2,
+        GAME_HEIGHT / 2,
+        GAME_WIDTH,
+        GAME_HEIGHT,
+        0xdde7e8,
+        1,
+      )
+      .setScrollFactor(0)
+      .setDepth(96)
+      .setAlpha(0)
+      .setVisible(false);
+    this.environment.setCurtainOpen(0);
+    const tornTextures = createYinTianTornPhotoTextures(this);
+    this.tornPhotoLeftTexture = tornTextures.left;
+    this.tornPhotoRightTexture = tornTextures.right;
+    this.photoPuzzleTextures = createYinTianPuzzleTextures(this);
     this.traveler = new Traveler(
       this,
       YIN_TIAN_PLAYER_START_X,
       YIN_TIAN_GROUND_Y,
     );
     this.narration = new NarrationSystem(this);
+    new WorldMusicPlayer(
+      this,
+      '《阴天》',
+      'assets/audio/yintian.mp3',
+    );
     this.storyDirector = new StoryDirector(this, YIN_TIAN_EVENTS);
     this.interactions = new InteractionSystem(this, this.traveler);
     this.interactions.addTarget({
-      id: 'room1-exit',
-      x: 30,
+      id: 'room1-curtain',
+      x: YIN_TIAN_CURTAIN_X,
       y: YIN_TIAN_GROUND_Y,
-      range: 22,
-      label: '返回主世界',
-      onInteract: () => this.returnToHub(),
+      range: 42,
+      label: '拉开窗帘',
+      onInteract: () => this.startCurtainEvent(),
     });
     this.interactions.addTarget({
       id: 'room1-cigarette',
@@ -245,6 +342,8 @@ export class YinTianScene extends Phaser.Scene {
       nameOffsetY: 54,
       onInteract: () => this.startPhotoEvent(),
     });
+    this.interactions.setTargetEnabled('room1-cigarette', false);
+    this.interactions.setTargetEnabled('room1-photo', false);
     this.interactions.addTarget({
       id: 'room2-tie',
       x: YIN_TIAN_TIE_X,
@@ -286,12 +385,7 @@ export class YinTianScene extends Phaser.Scene {
       name: '撕碎的照片',
       nameRange: 44,
       nameOffsetY: 15,
-      onInteract: () => this.inspectRoom2Object(
-        'room2-torn-photo',
-        YIN_TIAN_TORN_PHOTO_X,
-        252,
-        0xc5b8a3,
-      ),
+      onInteract: () => this.startTornPhotoEvent(),
     });
     this.interactions.addTarget({
       id: 'room2-wine',
@@ -404,6 +498,127 @@ export class YinTianScene extends Phaser.Scene {
     this.interactions.update();
     this.maybeStartRoom2Memory();
     this.maybeStartRoom3Event();
+  }
+
+  private startCurtainEvent(): void {
+    if (this.curtainComplete) {
+      return;
+    }
+    const event = this.storyDirector.begin(
+      'room1-curtain',
+      this.traveler.x,
+    );
+    if (!event) {
+      return;
+    }
+
+    this.curtainEvent = event;
+    this.inputLocked = event.lockInput;
+    this.interactions.setEnabled(false);
+    this.input.keyboard?.resetKeys();
+    this.traveler.stop();
+    this.curtainHint.setVisible(true);
+    this.input.on('pointerdown', this.handleCurtainPointerDown, this);
+    this.input.on('pointermove', this.handleCurtainPointerMove, this);
+    this.input.on('pointerup', this.handleCurtainPointerUp, this);
+    this.curtainFallback = this.time.delayedCall(
+      event.visualEffect.durationMs,
+      () => this.finishCurtainEvent(event),
+    );
+  }
+
+  private handleCurtainPointerDown(pointer: Phaser.Input.Pointer): void {
+    if (
+      this.paused ||
+      !this.curtainEvent ||
+      !pointer.leftButtonDown()
+    ) {
+      return;
+    }
+    this.curtainDragging = true;
+    this.curtainDragStartX =
+      pointer.x - this.curtainProgress * CURTAIN_DRAG_DISTANCE;
+  }
+
+  private handleCurtainPointerMove(pointer: Phaser.Input.Pointer): void {
+    if (
+      this.paused ||
+      !this.curtainDragging ||
+      !this.curtainEvent ||
+      !pointer.leftButtonDown()
+    ) {
+      return;
+    }
+    this.curtainProgress = Phaser.Math.Clamp(
+      (pointer.x - this.curtainDragStartX) / CURTAIN_DRAG_DISTANCE,
+      0,
+      1,
+    );
+    this.environment.setCurtainOpen(this.curtainProgress);
+    this.room1Darkness.setAlpha(
+      Phaser.Math.Linear(0.84, 0, this.curtainProgress),
+    );
+    if (this.curtainProgress >= 0.98) {
+      this.finishCurtainEvent(this.curtainEvent);
+    }
+  }
+
+  private handleCurtainPointerUp(pointer: Phaser.Input.Pointer): void {
+    if (!this.curtainDragging || !pointer.leftButtonReleased()) {
+      return;
+    }
+    this.curtainDragging = false;
+    if (this.curtainProgress >= 0.82 && this.curtainEvent) {
+      this.finishCurtainEvent(this.curtainEvent);
+    }
+  }
+
+  private finishCurtainEvent(event: StoryEvent): void {
+    if (this.curtainComplete) {
+      return;
+    }
+
+    this.curtainComplete = true;
+    this.curtainDragging = false;
+    this.curtainHint.setVisible(false);
+    this.curtainFallback?.remove(false);
+    this.curtainFallback = undefined;
+    this.input.off('pointerdown', this.handleCurtainPointerDown, this);
+    this.input.off('pointermove', this.handleCurtainPointerMove, this);
+    this.input.off('pointerup', this.handleCurtainPointerUp, this);
+    this.environment.setCurtainOpen(1);
+    this.tweens.add({
+      targets: this.room1Darkness,
+      alpha: 0,
+      duration: 260,
+      ease: 'Sine.easeOut',
+      onComplete: () => this.room1Darkness.setVisible(false),
+    });
+    this.room1Flash.setVisible(true).setAlpha(0);
+    this.tweens.add({
+      targets: this.room1Flash,
+      alpha: 0.82,
+      duration: 90,
+      hold: 45,
+      yoyo: true,
+      ease: 'Sine.easeOut',
+      onComplete: () => this.room1Flash.setVisible(false),
+    });
+    this.storyDirector.complete(event);
+    this.interactions.setTargetEnabled('room1-curtain', false);
+    this.interactions.setTargetEnabled('room1-cigarette', true);
+    this.interactions.setTargetEnabled('room1-photo', true);
+    this.time.delayedCall(180, () => {
+      this.narration.playOnce(
+        'yintian-room1-curtain',
+        '阴天，在不开灯的房间。',
+        34,
+      );
+    });
+    this.curtainEvent = undefined;
+    this.inputLocked = false;
+    this.input.keyboard?.resetKeys();
+    this.interactions.setEnabled(!this.paused);
   }
 
   private startCigaretteEvent(): void {
@@ -547,6 +762,284 @@ export class YinTianScene extends Phaser.Scene {
       .image(0, 0, textureKey)
       .setDisplaySize(32, 32);
     return this.add.container(0, 0, [frame, photo]);
+  }
+
+  private startTornPhotoEvent(): void {
+    const event = this.storyDirector.begin(
+      'room2-torn-photo',
+      this.traveler.x,
+    );
+    if (!event) {
+      return;
+    }
+
+    this.inputLocked = event.lockInput;
+    this.interactions.setEnabled(false);
+    this.input.keyboard?.resetKeys();
+    this.traveler.stop();
+    this.activeTornPhotoEvent = event;
+    this.photoPuzzleRevealStarted = false;
+    this.photoPuzzleFinished = false;
+    this.photoDim.setVisible(true).setAlpha(0);
+    this.tweens.add({
+      targets: this.photoDim,
+      alpha: 0.72,
+      duration: 260,
+      ease: 'Sine.easeOut',
+    });
+    this.createPhotoPuzzle();
+    this.input.on('pointerdown', this.handlePhotoPuzzlePointerDown, this);
+    this.input.on('pointermove', this.handlePhotoPuzzlePointerMove, this);
+    this.input.on('pointerup', this.handlePhotoPuzzlePointerUp, this);
+    this.photoPuzzleTimeout = this.time.delayedCall(15000, () => {
+      this.forceCompletePhotoPuzzle();
+    });
+    this.scheduleEventStep(event.visualEffect.durationMs, () => {
+      this.finishTornPhotoEvent(event);
+    });
+  }
+
+  private createPhotoPuzzle(): void {
+    const overlay = this.add
+      .container(0, 0)
+      .setScrollFactor(0)
+      .setDepth(74);
+    const frame = this.add.graphics();
+    frame.fillStyle(0x1a100d);
+    frame.fillRect(164, 49, 152, 152);
+    frame.fillStyle(0x5b3b27);
+    frame.fillRect(169, 54, 142, 142);
+    frame.fillStyle(0x8a6040);
+    frame.fillRect(173, 58, 134, 134);
+    frame.fillStyle(0x261713);
+    frame.fillRect(176, 61, 128, 128);
+    frame.fillStyle(0xc29569, 0.58);
+    frame.fillRect(171, 56, 119, 2);
+    frame.fillRect(171, 56, 2, 112);
+    frame.fillStyle(0x3a231b, 0.7);
+    frame.fillRect(303, 58, 3, 134);
+    frame.fillRect(173, 189, 134, 3);
+    overlay.add(frame);
+
+    const targets = [
+      { x: 176, y: 61 },
+      { x: 240, y: 61 },
+      { x: 176, y: 125 },
+      { x: 240, y: 125 },
+    ];
+    const starts = [
+      { x: 18, y: 190 },
+      { x: 102, y: 199 },
+      { x: 318, y: 199 },
+      { x: 398, y: 188 },
+    ];
+    this.photoPuzzlePieces = this.photoPuzzleTextures.map((texture, index) => {
+      const image = this.add
+        .image(starts[index].x, starts[index].y, texture)
+        .setDisplaySize(64, 64)
+        .setInteractive({ useHandCursor: true });
+      const piece: TornPhotoPiece = {
+        image,
+        targetX: targets[index].x,
+        targetY: targets[index].y,
+        solved: false,
+      };
+      overlay.add(image);
+      return piece;
+    });
+    this.tornPhotoOverlay = overlay;
+  }
+
+  private handlePhotoPuzzlePointerDown(
+    pointer: Phaser.Input.Pointer,
+  ): void {
+    if (
+      !pointer.leftButtonDown() ||
+      this.photoPuzzleRevealStarted ||
+      this.photoPuzzleFinished
+    ) {
+      return;
+    }
+
+    const piece = [...this.photoPuzzlePieces]
+      .reverse()
+      .find((candidate) =>
+        !candidate.solved &&
+        Math.abs(pointer.x - candidate.image.x) <= 32 &&
+        Math.abs(pointer.y - candidate.image.y) <= 32,
+      );
+    if (!piece) {
+      return;
+    }
+
+    this.photoPuzzleDraggingPiece = piece;
+    this.photoPuzzleDragOffsetX = pointer.x - piece.image.x;
+    this.photoPuzzleDragOffsetY = pointer.y - piece.image.y;
+    this.tornPhotoOverlay?.bringToTop(piece.image);
+  }
+
+  private handlePhotoPuzzlePointerMove(
+    pointer: Phaser.Input.Pointer,
+  ): void {
+    const piece = this.photoPuzzleDraggingPiece;
+    if (
+      !piece ||
+      piece.solved ||
+      !pointer.leftButtonDown() ||
+      this.photoPuzzleRevealStarted
+    ) {
+      return;
+    }
+    piece.image.setPosition(
+      Phaser.Math.Clamp(
+        pointer.x - this.photoPuzzleDragOffsetX,
+        0,
+        GAME_WIDTH - 64,
+      ),
+      Phaser.Math.Clamp(
+        pointer.y - this.photoPuzzleDragOffsetY,
+        0,
+        GAME_HEIGHT - 64,
+      ),
+    );
+  }
+
+  private handlePhotoPuzzlePointerUp(
+    pointer: Phaser.Input.Pointer,
+  ): void {
+    const piece = this.photoPuzzleDraggingPiece;
+    if (!piece || !pointer.leftButtonReleased()) {
+      return;
+    }
+    this.photoPuzzleDraggingPiece = undefined;
+    this.trySnapPhotoPiece(piece);
+  }
+
+  private trySnapPhotoPiece(piece: TornPhotoPiece): void {
+    if (piece.solved || this.photoPuzzleRevealStarted) {
+      return;
+    }
+
+    const distance = Phaser.Math.Distance.Between(
+      piece.image.x + 32,
+      piece.image.y + 32,
+      piece.targetX + 32,
+      piece.targetY + 32,
+    );
+    if (distance > 38) {
+      return;
+    }
+
+    piece.solved = true;
+    piece.image.disableInteractive();
+    this.tweens.add({
+      targets: piece.image,
+      x: piece.targetX,
+      y: piece.targetY,
+      duration: 180,
+      ease: 'Sine.easeOut',
+      onComplete: () => {
+        if (
+          !this.photoPuzzleRevealStarted &&
+          this.photoPuzzlePieces.every((candidate) => candidate.solved)
+        ) {
+          this.beginPhotoPuzzleReveal();
+        }
+      },
+    });
+  }
+
+  private forceCompletePhotoPuzzle(): void {
+    if (this.photoPuzzleRevealStarted || this.photoPuzzleFinished) {
+      return;
+    }
+    for (const piece of this.photoPuzzlePieces) {
+      piece.solved = true;
+      piece.image.disableInteractive();
+      piece.image.setPosition(piece.targetX, piece.targetY);
+    }
+    this.beginPhotoPuzzleReveal();
+  }
+
+  private beginPhotoPuzzleReveal(): void {
+    if (this.photoPuzzleRevealStarted || this.photoPuzzleFinished) {
+      return;
+    }
+    this.photoPuzzleRevealStarted = true;
+    this.photoPuzzleTimeout?.remove(false);
+    this.scheduleEventStep(650, () => {
+      this.revealTornPhoto();
+    });
+  }
+
+  private revealTornPhoto(): void {
+    if (!this.tornPhotoOverlay || this.photoPuzzleFinished) {
+      return;
+    }
+    for (const piece of this.photoPuzzlePieces) {
+      piece.image.setVisible(false);
+    }
+
+    const left = this.add
+      .image(176, 61, this.tornPhotoLeftTexture)
+      .setDisplaySize(128, 128);
+    const right = this.add
+      .image(176, 61, this.tornPhotoRightTexture)
+      .setDisplaySize(128, 128);
+    this.tornPhotoOverlay.add([left, right]);
+    this.tweens.add({
+      targets: left,
+      x: 166,
+      y: 84,
+      angle: -4,
+      alpha: 0.28,
+      duration: 1250,
+      ease: 'Sine.easeIn',
+    });
+    this.tweens.add({
+      targets: right,
+      x: 186,
+      y: 88,
+      angle: 4,
+      alpha: 0.28,
+      duration: 1250,
+      ease: 'Sine.easeIn',
+    });
+    this.narration.show(
+      '拼得回去的，只是照片。',
+      2400,
+      44,
+    );
+    if (this.activeTornPhotoEvent) {
+      this.scheduleEventStep(2400, () => {
+        if (this.activeTornPhotoEvent) {
+          this.finishTornPhotoEvent(this.activeTornPhotoEvent);
+        }
+      });
+    }
+  }
+
+  private finishTornPhotoEvent(event: StoryEvent): void {
+    if (!this.inputLocked || this.photoPuzzleFinished) {
+      return;
+    }
+
+    this.photoPuzzleFinished = true;
+    this.photoPuzzleTimeout?.remove(false);
+    this.photoPuzzleDraggingPiece = undefined;
+    this.input.off('pointerdown', this.handlePhotoPuzzlePointerDown, this);
+    this.input.off('pointermove', this.handlePhotoPuzzlePointerMove, this);
+    this.input.off('pointerup', this.handlePhotoPuzzlePointerUp, this);
+    this.storyDirector.complete(event);
+    this.interactions.setTargetEnabled('room2-torn-photo', false);
+    this.tornPhotoOverlay?.destroy();
+    this.tornPhotoOverlay = undefined;
+    this.photoPuzzlePieces = [];
+    this.activeTornPhotoEvent = undefined;
+    this.photoDim.setVisible(false);
+    this.inputLocked = false;
+    this.input.keyboard?.resetKeys();
+    this.interactions.setEnabled(!this.paused);
   }
 
   private inspectRoom2Object(
@@ -976,9 +1469,4 @@ export class YinTianScene extends Phaser.Scene {
     this.input.keyboard?.resetKeys();
   }
 
-  private returnToHub(): void {
-    this.input.keyboard?.resetKeys();
-    this.scene.wake('HubScene');
-    this.scene.sleep();
-  }
 }
